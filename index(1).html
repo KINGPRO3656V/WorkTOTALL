@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0f1e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TallUp – Grow in 30 Days</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06090f;
+    --surface: #0d1321;
+    --card: #111827;
+    --border: #1e2d40;
+    --accent: #00e5c3;
+    --accent2: #5b8fff;
+    --accent3: #ff6b6b;
+    --gold: #ffd166;
+    --text: #e8f0fe;
+    --muted: #6b7fa3;
+    --green: #00e5a0;
+    --radius: 18px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── Background mesh ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,229,195,.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(91,143,255,.07) 0%, transparent 60%);
+    pointer-events:none; z-index:0;
+  }
+
+  /* ── Header ── */
+  .header {
+    position:sticky; top:0; z-index:50;
+    background: rgba(6,9,15,.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; letter-spacing:-.5px; }
+  .logo span { color:var(--accent); }
+  .notif-btn {
+    width:40px; height:40px; border-radius:12px;
+    background:var(--card); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:1.1rem; position:relative;
+    transition: background .2s;
+  }
+  .notif-btn:active { background: var(--border); }
+  .notif-dot {
+    position:absolute; top:8px; right:9px;
+    width:7px; height:7px; border-radius:50%;
+    background:var(--accent3); border:2px solid var(--bg);
+    display:none;
+  }
+  .notif-dot.active { display:block; }
+
+  /* ── Scroll area ── */
+  .scroll { position:relative; z-index:1; padding:0 16px 100px; }
+
+  /* ── Hero card ── */
+  .hero {
+    background: linear-gradient(135deg, #0d2135 0%, #0f1e32 60%, #0d1a2e 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 16px 0 14px;
+    position:relative; overflow:hidden;
+  }
+  .hero::after {
+    content:'';
+    position:absolute; right:-30px; top:-20px;
+    width:160px; height:160px; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,229,195,.12) 0%, transparent 70%);
+  }
+  .hero-label { font-size:.72rem; letter-spacing:2px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; }
+  .hero-day { font-family:'Syne',sans-serif; font-size:2.4rem; font-weight:800; line-height:1; margin-bottom:4px; }
+  .hero-day span { color:var(--accent); }
+  .hero-sub { color:var(--muted); font-size:.88rem; margin-bottom:20px; }
+  .progress-bar-wrap { background:rgba(255,255,255,.06); border-radius:99px; height:8px; overflow:hidden; }
+  .progress-bar { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .6s ease; }
+  .progress-label { display:flex; justify-content:space-between; margin-top:8px; font-size:.75rem; color:var(--muted); }
+
+  /* ── Section title ── */
+  .section-title {
+    font-family:'Syne',sans-serif;
+    font-size:.72rem; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--muted); margin:22px 0 10px;
+  }
+
+  /* ── Streak row ── */
+  .streak-row {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px;
+  }
+  .streak-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:14px 10px; text-align:center;
+  }
+  .streak-icon { font-size:1.4rem; margin-bottom:4px; }
+  .streak-val { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:700; }
+  .streak-val.accent { color:var(--accent); }
+  .streak-val.gold { color:var(--gold); }
+  .streak-val.blue { color:var(--accent2); }
+  .streak-lbl { font-size:.7rem; color:var(--muted); margin-top:2px; }
+
+  /* ── Today's plan ── */
+  .plan-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden; margin-bottom:12px;
+  }
+  .plan-header {
+    padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--border);
+  }
+  .plan-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; }
+  .plan-badge {
+    font-size:.68rem; padding:3px 10px; border-radius:99px;
+    background: rgba(0,229,195,.12); color:var(--accent); font-weight:500;
+    border:1px solid rgba(0,229,195,.2);
+  }
+  .exercise-item {
+    padding:14px 18px; display:flex; align-items:center; gap:14px;
+    border-bottom:1px solid var(--border); cursor:pointer;
+    transition:background .15s;
+  }
+  .exercise-item:last-child { border-bottom:none; }
+  .exercise-item:active { background:rgba(255,255,255,.03); }
+  .ex-icon {
+    width:42px; height:42px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.25rem; flex-shrink:0;
+  }
+  .ex-icon.green { background:rgba(0,229,160,.12); }
+  .ex-icon.blue { background:rgba(91,143,255,.12); }
+  .ex-icon.orange { background:rgba(255,180,50,.12); }
+  .ex-icon.pink { background:rgba(255,100,150,.12); }
+  .ex-info { flex:1; }
+  .ex-name { font-weight:500; font-size:.92rem; margin-bottom:2px; }
+  .ex-detail { font-size:.75rem; color:var(--muted); }
+  .ex-check {
+    width:26px; height:26px; border-radius:8px;
+    border:2px solid var(--border); display:flex;
+    align-items:center; justify-content:center;
+    font-size:.8rem; transition: all .2s; flex-shrink:0;
+  }
+  .ex-check.done {
+    background:var(--accent); border-color:var(--accent); color:#06090f;
+  }
+
+  /* ── Tip card ── */
+  .tip-card {
+    background: linear-gradient(135deg, rgba(91,143,255,.1) 0%, rgba(0,229,195,.05) 100%);
+    border:1px solid rgba(91,143,255,.25);
+    border-radius:var(--radius); padding:18px; margin-bottom:12px;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .tip-icon { font-size:1.6rem; flex-shrink:0; margin-top:2px; }
+  .tip-title { font-family:'Syne',sans-serif; font-weight:700; font-size:.9rem; margin-bottom:5px; color:var(--accent2); }
+  .tip-text { font-size:.83rem; color:var(--muted); line-height:1.55; }
+
+  /* ── 30-Day calendar grid ── */
+  .cal-grid {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:6px;
+  }
+  .cal-day {
+    aspect-ratio:1; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.72rem; font-weight:600; cursor:pointer;
+    transition:transform .15s;
+    border:1px solid transparent;
+  }
+  .cal-day:active { transform:scale(.93); }
+  .cal-day.done { background:var(--accent); color:#06090f; }
+  .cal-day.today { background:rgba(0,229,195,.15); border-color:var(--accent); color:var(--accent); }
+  .cal-day.future { background:var(--card); color:var(--muted); }
+  .cal-day.rest { background:rgba(255,107,107,.1); color:var(--accent3); }
+
+  /* ── Sleep / nutrition cards ── */
+  .habit-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .habit-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:14px;
+  }
+  .habit-top { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .habit-emoji { font-size:1.2rem; }
+  .habit-lbl { font-size:.78rem; color:var(--muted); }
+  .habit-val { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; }
+  .habit-sub { font-size:.7rem; color:var(--muted); margin-top:2px; }
+  .ring-wrap { display:flex; align-items:center; gap:10px; }
+  .ring { width:44px; height:44px; }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:430px;
+    background:rgba(10,15,30,.92); backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    display:grid; grid-template-columns:repeat(4,1fr);
+    padding:8px 0 16px; z-index:50;
+  }
+  .nav-item {
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    font-size:.62rem; color:var(--muted); cursor:pointer;
+    transition:color .2s; padding:4px 0;
+  }
+  .nav-item.active { color:var(--accent); }
+  .nav-item svg { width:22px; height:22px; }
+
+  /* ── Toast ── */
+  .toast {
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#1a2840; border:1px solid var(--accent);
+    color:var(--text); padding:10px 20px; border-radius:99px;
+    font-size:.82rem; opacity:0; transition:all .3s;
+    white-space:nowrap; z-index:200; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ── Notification modal ── */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,.7);
+    z-index:100; display:flex; align-items:flex-end;
+    opacity:0; pointer-events:none; transition:opacity .3s;
+  }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal {
+    background:var(--surface); border-radius:24px 24px 0 0;
+    border:1px solid var(--border); border-bottom:none;
+    width:100%; max-width:430px; margin:0 auto;
+    padding:24px 20px 32px;
+    transform:translateY(100%); transition:transform .35s cubic-bezier(.32,.72,0,1);
+  }
+  .modal-overlay.open .modal { transform:translateY(0); }
+  .modal-handle { width:40px; height:4px; background:var(--border); border-radius:99px; margin:0 auto 20px; }
+  .modal-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; margin-bottom:16px; }
+  .notif-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 0; border-bottom:1px solid var(--border);
+  }
+  .notif-item:last-child { border-bottom:none; }
+  .notif-info { display:flex; align-items:center; gap:12px; }
+  .notif-ico { font-size:1.3rem; }
+  .notif-name { font-weight:500; font-size:.9rem; }
+  .notif-time { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  /* Toggle */
+  .toggle {
+    width:44px; height:26px; border-radius:99px;
+    background:var(--border); position:relative; cursor:pointer;
+    transition:background .25s; flex-shrink:0;
+  }
+  .toggle.on { background:var(--accent); }
+  .toggle::after {
+    content:''; position:absolute; width:20px; height:20px;
+    background:#fff; border-radius:50%; top:3px; left:3px;
+    transition:transform .25s;
+  }
+  .toggle.on::after { transform:translateX(18px); }
+  .close-modal {
+    width:100%; margin-top:20px; padding:14px;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:.9rem; font-weight:500; cursor:pointer; transition:background .2s;
+  }
+  .close-modal:active { background:var(--border); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .hero { animation:fadeUp .5s ease both; }
+  .streak-row { animation:fadeUp .5s .08s ease both; }
+  .plan-card { animation:fadeUp .5s .12s ease both; }
+  .tip-card { animation:fadeUp .5s .16s ease both; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Tall<span>Up</span></div>
+  <div class="notif-btn" id="notifBtn" onclick="openModal()">
+    🔔
+    <div class="notif-dot active" id="notifDot"></div>
+  </div>
+</div>
+
+<!-- MAIN SCROLL -->
+<div class="scroll">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Your Journey</div>
+    <div class="hero-day">Day <span id="currentDay">1</span> <span style="color:var(--muted);font-size:1.4rem">/ 30</span></div>
+    <div class="hero-sub" id="heroSub">Morning stretch complete · 0 cm tracked</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar" style="width:3.3%"></div>
+    </div>
+    <div class="progress-label">
+      <span id="pctLabel">3%</span>
+      <span>30 days</span>
+    </div>
+  </div>
+
+  <!-- STREAKS -->
+  <div class="streak-row">
+    <div class="streak-card">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-val accent" id="streakVal">1</div>
+      <div class="streak-lbl">Day Streak</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-icon">✅</div>
+      <div class="streak-val gold" id="doneVal">0</div>
+      <div class="streak-lbl">Done Today</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-icon">📏</div>
+      <div class="streak-val blue" id="cmVal">+0</div>
+      <div class="streak-lbl">cm Gained</div>
+    </div>
+  </div>
+
+  <!-- TODAY'S PLAN -->
+  <div class="section-title">Today's Exercises</div>
+  <div class="plan-card">
+    <div class="plan-header">
+      <div class="plan-title" id="dayTitle">Day 1 — Spine Foundation</div>
+      <div class="plan-badge" id="dayBadge">Beginner</div>
+    </div>
+    <div id="exerciseList"></div>
+  </div>
+
+  <!-- DAILY TIP -->
+  <div class="section-title">Today's Tip</div>
+  <div class="tip-card" id="tipCard">
+    <div class="tip-icon">💡</div>
+    <div>
+      <div class="tip-title">Loading tip…</div>
+      <div class="tip-text"></div>
+    </div>
+  </div>
+
+  <!-- HABITS -->
+  <div class="section-title">Daily Habits</div>
+  <div class="habit-row">
+    <div class="habit-card">
+      <div class="habit-top"><span class="habit-emoji">😴</span><span class="habit-lbl">Sleep</span></div>
+      <svg class="ring" viewBox="0 0 44 44">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent2)" stroke-width="4"
+          stroke-dasharray="113" stroke-dashoffset="28" stroke-linecap="round"
+          transform="rotate(-90 22 22)"/>
+      </svg>
+      <div class="habit-val">8 hrs</div>
+      <div class="habit-sub">Optimal for HGH</div>
+    </div>
+    <div class="habit-card">
+      <div class="habit-top"><span class="habit-emoji">💧</span><span class="habit-lbl">Hydration</span></div>
+      <svg class="ring" viewBox="0 0 44 44">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" stroke-width="4"
+          stroke-dasharray="113" stroke-dashoffset="57" stroke-linecap="round"
+          transform="rotate(-90 22 22)"/>
+      </svg>
+      <div class="habit-val">1.5 L</div>
+      <div class="habit-sub">Target: 2.5 L</div>
+    </div>
+  </div>
+
+  <!-- 30-DAY CALENDAR -->
+  <div class="section-title">30-Day Progress</div>
+  <div class="cal-grid" id="calGrid"></div>
+
+</div><!-- /scroll -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Today
+  </div>
+  <div class="nav-item" onclick="cycleTip()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 3-2 5-2 7H7c0-2-2-4-2-7a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/><line x1="12" y1="21" x2="12" y2="18"/></svg>
+    Tips
+  </div>
+  <div class="nav-item" onclick="addCm()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Log
+  </div>
+  <div class="nav-item" onclick="advanceDay()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    Next Day
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NOTIFICATION MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔔 Notifications</div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">🌅</div>
+        <div>
+          <div class="notif-name">Morning Stretch</div>
+          <div class="notif-time">6:30 AM · Daily</div>
+        </div>
+      </div>
+      <div class="toggle on" id="t1" onclick="toggleNotif('t1')"></div>
+    </div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">☀️</div>
+        <div>
+          <div class="notif-name">Midday Exercises</div>
+          <div class="notif-time">12:00 PM · Daily</div>
+        </div>
+      </div>
+      <div class="toggle on" id="t2" onclick="toggleNotif('t2')"></div>
+    </div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">🌙</div>
+        <div>
+          <div class="notif-name">Evening Routine</div>
+          <div class="notif-time">8:00 PM · Daily</div>
+        </div>
+      </div>
+      <div class="toggle on" id="t3" onclick="toggleNotif('t3')"></div>
+    </div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">💧</div>
+        <div>
+          <div class="notif-name">Hydration Reminder</div>
+          <div class="notif-time">Every 2 hours</div>
+        </div>
+      </div>
+      <div class="toggle" id="t4" onclick="toggleNotif('t4')"></div>
+    </div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">😴</div>
+        <div>
+          <div class="notif-name">Bedtime Alarm</div>
+          <div class="notif-time">10:00 PM · Daily</div>
+        </div>
+      </div>
+      <div class="toggle" id="t5" onclick="toggleNotif('t5')"></div>
+    </div>
+
+    <div class="notif-item">
+      <div class="notif-info">
+        <div class="notif-ico">🏆</div>
+        <div>
+          <div class="notif-name">Weekly Progress Report</div>
+          <div class="notif-time">Sundays 9:00 AM</div>
+        </div>
+      </div>
+      <div class="toggle on" id="t6" onclick="toggleNotif('t6')"></div>
+    </div>
+
+    <button class="close-modal" onclick="closeModal()">Done</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const EXERCISES = [
+  [
+    {icon:'🧘',color:'green',name:'Cobra Stretch',detail:'3 sets × 30 sec · Spine extension'},
+    {icon:'🏃',color:'blue',name:'Hanging Bar',detail:'3 sets × 1 min · Spine decompression'},
+    {icon:'🦵',color:'orange',name:'Pelvic Tilt',detail:'3 sets × 15 reps · Core activation'},
+    {icon:'🙆',color:'pink',name:'Cat-Cow Stretch',detail:'3 sets × 20 reps · Flexibility'},
+  ],
+  [
+    {icon:'🤸',color:'green',name:'Superman Hold',detail:'3 sets × 20 sec · Back strength'},
+    {icon:'🧗',color:'blue',name:'Dead Hang',detail:'3 sets × 45 sec · Spine stretch'},
+    {icon:'🦶',color:'orange',name:'Calf Raises',detail:'4 sets × 20 reps · Leg lengthening'},
+    {icon:'🌉',color:'pink',name:'Bridge Pose',detail:'3 sets × 30 sec · Hip flexors'},
+  ],
+  [
+    {icon:'🏋',color:'green',name:'Jump Squats',detail:'4 sets × 12 reps · Growth stimulus'},
+    {icon:'🧘',color:'blue',name:'Forward Fold',detail:'3 sets × 40 sec · Hamstring stretch'},
+    {icon:'🤼',color:'orange',name:'Inversion Hang',detail:'2 sets × 1 min · Gravity reversal'},
+    {icon:'💪',color:'pink',name:'Wall Angels',detail:'3 sets × 15 reps · Posture correction'},
+  ],
+  [
+    {icon:'🏊',color:'green',name:'Swimming Motion',detail:'3 sets × 30 sec · Full body stretch'},
+    {icon:'🦩',color:'blue',name:'Standing Reach',detail:'3 sets × 20 reps · Overhead extension'},
+    {icon:'🧍',color:'orange',name:'Posture Walk',detail:'10 min · Spine alignment'},
+    {icon:'🌀',color:'pink',name:'Spinal Twist',detail:'3 sets × 30 sec · Disc health'},
+  ],
+];
+
+const TIPS = [
+  {title:'Sleep for Growth Hormone',icon:'😴',text:'Deep sleep (stages 3-4) triggers 80% of your daily HGH release. Aim for 8-9 hours. Going to bed before 11 PM maximizes your growth hormone pulse.'},
+  {title:'Nutrition Matters',icon:'🥦',text:'Zinc, calcium, vitamin D and protein are critical. Eat eggs, dairy, leafy greens, and lean meat. Avoid junk food that suppresses HGH.'},
+  {title:'Posture = Instant Height',icon:'🧍',text:'Poor posture can hide 2-4 cm of real height. Practice chin-tuck, shoulder-back position every hour. Your spine will thank you.'},
+  {title:'Decompress Your Spine',icon:'🏗️',text:'Hanging from a bar daily can temporarily decompress spinal discs by up to 3 cm. Do it consistently for lasting cartilage health.'},
+  {title:'Hydrate Your Discs',icon:'💧',text:'Intervertebral discs are 80% water. Drinking 2.5L daily keeps them plump, which directly adds to your standing height.'},
+  {title:'Avoid Compression',icon:'🚫',text:'Heavy weight-lifting, carrying heavy bags on one shoulder, or sitting hunched for hours compresses discs. Stand up every 45 minutes.'},
+  {title:'Sunlight & Vitamin D',icon:'☀️',text:'15 minutes of morning sun boosts Vitamin D which is essential for bone density and growth. Step outside every morning.'},
+  {title:'Stress Kills Growth',icon:'🧠',text:'Cortisol (stress hormone) directly suppresses HGH. Meditate for 5 min, practice deep breathing, and keep your mind calm.'},
+];
+
+const DAY_NAMES = [
+  'Spine Foundation','Upper Body Stretch','Lower Body Power','Full Body Flow',
+  'Core & Posture','Active Recovery','Flexibility Blast','Strength & Stretch',
+  'Inversion Day','Cardio & Reach','Deep Stretch','Power Moves',
+  'Spine Circuit','Leg Length Focus','Arms & Hang','Hip & Pelvis',
+  'Breathwork Day','Balance & Posture','Sprint Stretch','Swim Routine',
+  'Rest & Recover','Yoga Flow','Joint Mobility','Explosive Jumps',
+  'Spine Reset','Hang Master','Core Deep','Shoulder Open','Peak Routine','Final Push',
+];
+const BADGES = ['Beginner','Beginner','Moderate','Moderate','Advanced','Rest','Advanced','Moderate'];
+
+// ── STATE ──
+let state = JSON.parse(localStorage.getItem('tallup') || '{}');
+if (!state.day) state = { day:1, streak:1, cm:0, completedDays:[], checks:{}, tipIdx:0 };
+
+function save() { localStorage.setItem('tallup', JSON.stringify(state)); }
+
+// ── RENDER ──
+function render() {
+  const d = state.day;
+  document.getElementById('currentDay').textContent = d;
+  const pct = Math.round((d/30)*100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('pctLabel').textContent = pct + '%';
+  document.getElementById('heroSub').textContent = `Day ${d} of 30 · Keep going 💪`;
+
+  document.getElementById('streakVal').textContent = state.streak;
+  document.getElementById('doneVal').textContent = Object.values(state.checks).filter(Boolean).length;
+  document.getElementById('cmVal').textContent = '+' + state.cm.toFixed(1);
+
+  // title/badge
+  document.getElementById('dayTitle').textContent = `Day ${d} — ${DAY_NAMES[d-1]}`;
+  document.getElementById('dayBadge').textContent = BADGES[(d-1)%BADGES.length];
+
+  // exercises
+  const exSet = EXERCISES[(d-1)%EXERCISES.length];
+  const list = document.getElementById('exerciseList');
+  list.innerHTML = '';
+  exSet.forEach((ex, i) => {
+    const key = `d${d}_e${i}`;
+    const done = state.checks[key];
+    const el = document.createElement('div');
+    el.className = 'exercise-item';
+    el.innerHTML = `
+      <div class="ex-icon ${ex.color}">${ex.icon}</div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-detail">${ex.detail}</div>
+      </div>
+      <div class="ex-check ${done?'done':''}">${done?'✓':''}</div>
+    `;
+    el.onclick = () => toggleExercise(key);
+    list.appendChild(el);
+  });
+
+  // tip
+  const tip = TIPS[state.tipIdx % TIPS.length];
+  document.getElementById('tipCard').innerHTML = `
+    <div class="tip-icon">${tip.icon}</div>
+    <div>
+      <div class="tip-title">${tip.title}</div>
+      <div class="tip-text">${tip.text}</div>
+    </div>
+  `;
+
+  // calendar
+  const cal = document.getElementById('calGrid');
+  cal.innerHTML = '';
+  for (let i=1; i<=30; i++) {
+    const el = document.createElement('div');
+    const isRest = i % 7 === 0;
+    if (state.completedDays.includes(i)) el.className = 'cal-day done';
+    else if (i === d) el.className = 'cal-day today';
+    else if (isRest && i > d) el.className = 'cal-day rest';
+    else el.className = 'cal-day future';
+    el.textContent = i;
+    cal.appendChild(el);
+  }
+}
+
+function toggleExercise(key) {
+  state.checks[key] = !state.checks[key];
+  const done = Object.values(state.checks).filter(v=>v).length;
+  document.getElementById('doneVal').textContent = done;
+  save();
+  render();
+  showToast(state.checks[key] ? '✅ Exercise done!' : '↩️ Unmarked');
+}
+
+function cycleTip() {
+  state.tipIdx = (state.tipIdx + 1) % TIPS.length;
+  save(); render();
+  showToast('💡 New tip loaded!');
+}
+
+function addCm() {
+  state.cm = parseFloat((state.cm + 0.1).toFixed(1));
+  save(); render();
+  showToast(`📏 +0.1 cm logged! Total: +${state.cm} cm`);
+}
+
+function advanceDay() {
+  if (state.day >= 30) { showToast('🎉 Challenge complete!'); return; }
+  if (!state.completedDays.includes(state.day)) state.completedDays.push(state.day);
+  state.day++;
+  state.streak++;
+  state.tipIdx = (state.tipIdx + 1) % TIPS.length;
+  save(); render();
+  showToast(`🚀 Day ${state.day} unlocked!`);
+}
+
+// ── NOTIFICATIONS ──
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('notifDot').classList.remove('active');
+  requestNotifPermission();
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+function toggleNotif(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+  showToast(on ? '🔔 Notification enabled' : '🔕 Notification disabled');
+}
+
+function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') scheduleNotifications();
+    });
+  } else if (Notification.permission === 'granted') {
+    scheduleNotifications();
+  }
+}
+
+function scheduleNotifications() {
+  if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === 'granted') {
+    // Morning reminder
+    const now = new Date();
+    const morning = new Date(now); morning.setHours(6,30,0,0);
+    if (morning < now) morning.setDate(morning.getDate()+1);
+    const msUntil = morning - now;
+    setTimeout(() => {
+      new Notification('🌅 TallUp Morning Stretch', {
+        body: `Good morning! Day ${state.day} — Time for your spine exercises. Let's grow! 💪`,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📏</text></svg>',
+        tag: 'tallup-morning'
+      });
+    }, Math.min(msUntil, 2147483647));
+  }
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── SIMULATED NOTIFICATION PULSE ──
+setTimeout(() => {
+  document.getElementById('notifDot').classList.add('active');
+}, 8000);
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
